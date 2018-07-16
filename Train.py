@@ -6,14 +6,12 @@ from DataProc import load_data, make_minibatches
 
 
 def train(args):
-    # TODO make fns after the format of data is known
-    minibatchs_X, minibatchs_Y = make_minibatches(load_data(args.data_dir), args.minibatch_size)
+    minibatchs_X, minibatchs_Y = make_minibatches(load_data(args.datafile), args.minibatch_size)
 
     tf.reset_default_graph()
 
     X = tf.placeholder(tf.float32, shape=[None, 320, 162, 3], name='X')
-    # TODO change according to the number of output neurons.
-    Y = tf.placeholder(tf.float32, shape=[None, 1], name='Y')
+    Y = tf.placeholder(tf.float32, shape=[None, 4], name='Y')
 
     pred = network(X)
 
@@ -62,10 +60,10 @@ def train(args):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     # TODO change the number of epochs, batch size - if rqd.
-    parser.add_argument('--num_epochs', type=int, default=500)
-    parser.add_argument('--minibatch_size', type=int, default=128)
+    parser.add_argument('--num_epochs', type=int, default=10)
+    parser.add_argument('--minibatch_size', type=int, default=2)
     parser.add_argument('--restore', type=bool, default=False)
-    parser.add_argument('--data_dir', type=str)
+    parser.add_argument('--datafile', type=str)
     parser.add_argument('--save_dir', type=str)
     parser.add_argument('--summary_dir', type=str)
 

@@ -99,6 +99,10 @@ def network(inp):
     # 17 X 7 X 64 = 7616
     act = fc_layer(flat, 7616, 100, activation_function='relu')
     act = fc_layer(act, 100, 50, activation_function='relu')
-    # TODO number of output neurons??
-    act = fc_layer(act, 50, 1)
-    return act
+
+    acc = fc_layer(act, 50, 3, activation_function='tanh')
+    steer = fc_layer(act, 50, 1, activation_function='relu')
+
+    out = tf.concat([acc, steer], 1)
+
+    return out
