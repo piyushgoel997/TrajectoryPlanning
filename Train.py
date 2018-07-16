@@ -4,13 +4,16 @@ from Model import network
 import time
 from DataProc import load_data, make_minibatches
 
-print("importing done")
+print("Importing done")
 
 
 def train(args):
 
+    log_file = open(args.log_file, 'w')
+
     minibatchs_X, minibatchs_Y = make_minibatches(*load_data(args.datafile), args.minibatch_size)
     print("Data loaded")
+    log_file.write("Data loaded")
 
     tf.reset_default_graph()
 
@@ -34,6 +37,7 @@ def train(args):
             restore_path = tf.train.latest_checkpoint(args.save_dir)
             saver.restore(sess, restore_path)
             print('restored the model from' + str(restore_path))
+            log_file.write('restored the model from' + str(restore_path))
         else:
             sess.run(init)
 
@@ -41,6 +45,7 @@ def train(args):
 
         train_start = time.time()
         print("Training started")
+        log_file.write("Training started")
 
         for epoch in range(args.num_epochs):
             epoch_start = time.time()
@@ -55,28 +60,34 @@ def train(args):
 
                 print("Epoch " + str(epoch + 1) + " - Minibatch " + str(minibatch + 1) +
                       " completed with loss = " + str(_loss))
+                log_file.write("Epoch " + str(epoch + 1) + " - Minibatch " + str(minibatch + 1) +
+                               " completed with loss = " + str(_loss))
             summary_writer.add_summary(_summ)
 
             print("EPOCH " + str(epoch + 1) +
                   " completed in " + str(time.time() - epoch_start)[:5] +
                   " secs with average loss = " + str(sum(losses)/len(losses)))
+            log_file.write("EPOCH " + str(epoch + 1) +
+                           " completed in " + str(time.time() - epoch_start)[:5] +
+                           " secs with average loss = " + str(sum(losses)/len(losses)))
 
-            if (epoch + 1) % 100 == 0:
-                save_path = saver.save(sess, args.save_dir + 'model.ckpt')
-                print("Model saved in the dir " + str(save_path))
+            save_path = saver.save(sess, args.save_dir + 'model.ckpt')
+            print("Model saved in the dir " + str(save_path))
+            log_file.write("Model saved in the dir " + str(save_path) + "\n")
 
         print("Training Finished in " + str(time.time() - train_start)[:5])
+        log_file.write("Training Finished in " + str(time.time() - train_start)[:5])
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    # TODO change the number of epochs, batch size - if rqd.
     parser.add_argument('--num_epochs', type=int, default=1000)
     parser.add_argument('--minibatch_size', type=int, default=128)
     parser.add_argument('--restore', type=bool, default=False)
     parser.add_argument('--datafile', type=str)
     parser.add_argument('--save_dir', type=str)
     parser.add_argument('--summary_dir', type=str)
+    parser.add_argument('--log_file', type=str, default='log.txt')
 
     args = parser.parse_args()
 
