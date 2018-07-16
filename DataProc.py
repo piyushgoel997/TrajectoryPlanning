@@ -13,14 +13,15 @@ def load_data(data_file):
     """
     data = pd.read_csv(data_file)
     size = data.shape[0]  # number of training examples
-    X = np.zeros((size, 320, 160, 3))
+    X = np.zeros((size, 160, 320, 3))
     Y = np.zeros((size, 4))
     for i in range(size):
-        X[i] = cv2.imread("images/" + str(data.loc['CENTER'][i]))
-        Y[i, 0] = float(data.loc['THROTTLE'][i])
-        Y[i, 1] = float(data.loc['ACCELERATION'][i])
-        Y[i, 2] = float(data.loc['BRAKE'][i])
-        Y[i, 3] = float(data.loc['STEER'][i])
+        X[i] = cv2.imread("images/" + str(data.loc[i]['CENTER']))
+        Y[i, 0] = float(data.loc[i]['THROTTLE'])
+        Y[i, 1] = float(data.loc[i]['ACCELERATION'])
+        Y[i, 2] = float(data.loc[i]['BRAKE'])
+        Y[i, 3] = float(data.loc[i]['STEER'])
+
     return X, Y
 
 

@@ -77,31 +77,26 @@ def network(inp):
     Takes as input a batch of images (states) and gives an output batch of vectors (actions)
     """
 
-    # formula to calculate the output size of image after a convolution
-    # floor(((n-f)/s) + 1)
-
     norm_inp = tf.contrib.layers.batch_norm(inp)
 
-    # 320 X 160
+    # 320, 162
     act = conv_layer(norm_inp, 3, 12, 5, 2, activation_function='relu', name='conv1')
-    # 158 X 78
+    # 158, 79
     act = conv_layer(act, 12, 24, 5, 2, activation_function='relu', name='conv2')
-    # 77 X 37
+    # 77, 38
     act = conv_layer(act, 24, 36, 5, 2, activation_function='relu', name='conv3')
-
-    # 37 X 17
+    # 37, 17
     act = conv_layer(act, 36, 48, 3, 2, activation_function='relu', name='conv4')
-    # 17 X 7
+    # 18, 8
     act = conv_layer(act, 48, 64, 3, 2, activation_function='relu', name='conv5')
-
+    # 8, 3
     flat = tf.layers.flatten(act)
+    # 8*3*64 = 1536
+    act = fc_layer(flat, 1536, 100, activation_function='relu', name='fc1')
+    act = fc_layer(act, 100, 50, activation_function='relu', name='fc2')
 
-    # 17 X 7 X 64 = 7616
-    act = fc_layer(flat, 7616, 100, activation_function='relu')
-    act = fc_layer(act, 100, 50, activation_function='relu')
-
-    acc = fc_layer(act, 50, 3, activation_function='tanh')
-    steer = fc_layer(act, 50, 1, activation_function='relu')
+    acc = fc_layer(act, 50, 3, activation_function='tanh', name='fc3_a')
+    steer = fc_layer(act, 50, 1, activation_function='relu', name='fc3_s')
 
     out = tf.concat([acc, steer], 1)
 
