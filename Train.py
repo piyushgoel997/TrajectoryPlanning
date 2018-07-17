@@ -13,7 +13,7 @@ def train(args):
 
     minibatchs_X, minibatchs_Y = make_minibatches(*load_data(args.datafile), args.minibatch_size)
     print("Data loaded")
-    log_file.write("Data loaded")
+    log_file.write("Data loaded\n")
 
     tf.reset_default_graph()
 
@@ -37,7 +37,7 @@ def train(args):
             restore_path = tf.train.latest_checkpoint(args.save_dir)
             saver.restore(sess, restore_path)
             print('restored the model from' + str(restore_path))
-            log_file.write('restored the model from' + str(restore_path))
+            log_file.write('restored the model from' + str(restore_path) + "\n")
         else:
             sess.run(init)
 
@@ -45,7 +45,7 @@ def train(args):
 
         train_start = time.time()
         print("Training started")
-        log_file.write("Training started")
+        log_file.write("Training started\n")
 
         for epoch in range(args.num_epochs):
             epoch_start = time.time()
@@ -61,7 +61,7 @@ def train(args):
                 print("Epoch " + str(epoch + 1) + " - Minibatch " + str(minibatch + 1) +
                       " completed with loss = " + str(_loss))
                 log_file.write("Epoch " + str(epoch + 1) + " - Minibatch " + str(minibatch + 1) +
-                               " completed with loss = " + str(_loss))
+                               " completed with loss = " + str(_loss) + "\n")
             summary_writer.add_summary(_summ)
 
             print("EPOCH " + str(epoch + 1) +
@@ -69,19 +69,22 @@ def train(args):
                   " secs with average loss = " + str(sum(losses)/len(losses)))
             log_file.write("EPOCH " + str(epoch + 1) +
                            " completed in " + str(time.time() - epoch_start)[:5] +
-                           " secs with average loss = " + str(sum(losses)/len(losses)))
+                           " secs with average loss = " + str(sum(losses)/len(losses)) + "\n")
 
             save_path = saver.save(sess, args.save_dir + 'model.ckpt')
             print("Model saved in the dir " + str(save_path))
             log_file.write("Model saved in the dir " + str(save_path) + "\n")
 
         print("Training Finished in " + str(time.time() - train_start)[:5])
-        log_file.write("Training Finished in " + str(time.time() - train_start)[:5])
+        log_file.write("Training Finished in " + str(time.time() - train_start)[:5] + "\n")
+
+        log_file.close()
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--num_epochs', type=int, default=1000)
+
+    parser.add_argument('--num_epochs', type=int, default=200)
     parser.add_argument('--minibatch_size', type=int, default=128)
     parser.add_argument('--restore', type=bool, default=False)
     parser.add_argument('--datafile', type=str)
