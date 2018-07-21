@@ -11,9 +11,10 @@ def train(args):
 
     log_file = open(args.log_file, 'w')
 
-    minibatchs_X, minibatchs_Y = make_minibatches(*load_data(args.datafile), args.minibatch_size)
-    print("Data loaded")
-    log_file.write("Data loaded\n")
+    if not args.test:
+        minibatchs_X, minibatchs_Y = make_minibatches(*load_data(args.datafile), args.minibatch_size)
+        print("Data loaded")
+        log_file.write("Data loaded\n")
 
     tf.reset_default_graph()
 
@@ -33,6 +34,14 @@ def train(args):
     saver = tf.train.Saver()
 
     with tf.Session() as sess:
+
+        if args.test:
+            restore_path = tf.train.latest_checkpoint(args.save_dir)
+            saver.restore(sess, restore_path)
+            print('restored the model from' + str(restore_path))
+            pred_action = sess.run(pred, feed_dict={X: args.image})
+            return pred_action
+
         if args.restore:
             restore_path = tf.train.latest_checkpoint(args.save_dir)
             saver.restore(sess, restore_path)
@@ -91,6 +100,7 @@ if __name__ == '__main__':
     parser.add_argument('--save_dir', type=str)
     parser.add_argument('--summary_dir', type=str)
     parser.add_argument('--log_file', type=str, default='log.txt')
+    parser.add_argument('--test', type=bool, default=False)
 
     args = parser.parse_args()
 
