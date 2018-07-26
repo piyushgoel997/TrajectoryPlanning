@@ -7,11 +7,12 @@ from DataProc import load_data, make_minibatches
 print("Importing done")
 
 
-def train(args):
+def train(args, test_image, test=False):
 
-    log_file = open(args.log_file, 'w')
+    log_file = None
 
-    if not args.test:
+    if not test:
+        log_file = open(args.log_file, 'w')
         minibatchs_X, minibatchs_Y = make_minibatches(*load_data(args.datafile), args.minibatch_size)
         print("Data loaded")
         log_file.write("Data loaded\n")
@@ -35,11 +36,11 @@ def train(args):
 
     with tf.Session() as sess:
 
-        if args.test:
-            restore_path = tf.train.latest_checkpoint(args.save_dir)
+        if test:
+            restore_path = tf.train.latest_checkpoint('model')
             saver.restore(sess, restore_path)
             print('restored the model from' + str(restore_path))
-            pred_action = sess.run(pred, feed_dict={X: args.image})
+            pred_action = sess.run(pred, feed_dict={X: test_image})
             return pred_action
 
         if args.restore:
@@ -104,4 +105,4 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    train(args)
+    train(args, None)

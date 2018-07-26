@@ -23,7 +23,6 @@ MIN_SPEED = 10
 # and a speed limit
 speed_limit = MAX_SPEED
 
-
 # registering event handler for the server
 @sio.on('telemetry')
 def telemetry(sid, data):
@@ -42,15 +41,7 @@ def telemetry(sid, data):
 
             # predict the steering angle for the image
 
-            parser = argparse.ArgumentParser()
-
-            parser.add_argument('--save_dir', type=str, default='/model/')
-            parser.add_argument('--test', type=bool, default=True)
-            parser.add_argument('--image', default=image)
-
-            args = parser.parse_args()
-
-            predictions = train(args)
+            predictions = train(None, image, test=True)
             steering_angle = float(predictions[len(predictions) - 1])
             # lower the throttle as the speed increases
             # if the speed is above the current speed limit, we are on a downhill.
